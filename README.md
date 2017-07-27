@@ -15,7 +15,7 @@ Helping Kiwon
 
 * *gene_essential_cnt* : gene essentiality is based on deep_input_c3_pert_v2LogN file.
 *  *breast_cancer_node_df* : node data frame of network. cluster marked, centrality calculated.
-*  
+*  *breast_cancer_node_df_central_ess_marked* : src / centralities... / c1_ess/ c3_ess / c3_cs_ess
 
 ## lab note by date
 #### 2017-07-21
@@ -36,5 +36,7 @@ Visualized cluster c2f4 with cytoscape
 
 * drew box plot for centralities in two groups (essential, non-essential)
 
+#### 2017-07-27
 
+* centrality group divided by c1, c3, c3_cs cutoff (by Input data files)
 

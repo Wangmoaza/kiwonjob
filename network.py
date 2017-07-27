@@ -221,6 +221,8 @@ def main():
 	node_df.to_csv('breast_cancer_node_df', sep='\t')
 ### END - main
 
+def mark_essentiality(gene_df, ess_file, non_file):
+
 if __name__ == "__main__":
 	main()
 
