@@ -40,3 +40,17 @@ Visualized cluster c2f4 with cytoscape
 
 * centrality group divided by c1, c3, c3_cs cutoff (by Input data files)
 
+#### 2017-07-31
+
+* pairwise distance calculation something wrong. need to check random selection along with cluster nodes
+* node_df missing many dest nodes. need to check this again.
+
+#### TODO
+
+* clueGO gene ontology plugin for cytoscape: map clustered or essential genes to gene ontology, or KEGG pathway
+    - find a module for mapping
+    - 1. [KGML pathway](http://biopython.org/DIST/docs/api/Bio.KEGG.KGML.KGML_pathway-module.html): biopython
+    - 2. [Pathview](http://pathview.r-forge.r-project.org/): bioconductor for R
+    - 3. [clueGO](http://apps.cytoscape.org/apps/cluego): cytoscape plugin
+
+* pairwise distance calculation for clustered genes compared with randomly selected genes (same count)
