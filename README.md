@@ -16,6 +16,7 @@ Helping Kiwon
 * *gene_essential_cnt* : gene essentiality is based on deep_input_c3_pert_v2LogN file.
 *  *breast_cancer_node_df* : node data frame of network. cluster marked, centrality calculated.
 *  *breast_cancer_node_df_central_ess_marked* : src / centralities... / c1_ess/ c3_ess / c3_cs_ess
+*  *breast_cancer_all_nodes_df* : breast_cancer_nodes_df does not include leaf nodes in the network. This file does.
 
 ## lab note by date
 #### 2017-07-21
@@ -44,6 +45,11 @@ Visualized cluster c2f4 with cytoscape
 
 * pairwise distance calculation something wrong. need to check random selection along with cluster nodes
 * node_df missing many dest nodes. need to check this again.
+
+#### 2017-08-02
+
+* fixed node_df to include all nodes (leaf nodes too). saved in file breast_cancer_all_nodes_df
+* fixed pairwise distance calculation
 
 #### TODO
 

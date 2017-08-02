@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
+from sklearn.utils import shuffle
 
 def print_stat(network_df):
 	""" This method prints statistics of the network based on pandas DataFrame.
@@ -11,14 +12,14 @@ def print_stat(network_df):
 		network_df (pd.DataFrame) : data frame containig network information
 
 	"""
-    src_nodes = set(np.unique(network_df.src.values))
-    dest_nodes = set(np.unique(network_df.dest.values))
-    print "number of all nodes: " + str(len(src_nodes | dest_nodes))
-    print "number of src nodes: " + str(np.unique(network_df.src.values).shape[0])
-    print "number of dest nodes: " + str(np.unique(network_df.dest.values).shape[0])
-    print "number of src_nodes - dest_nodes: " + str(len(src_nodes - dest_nodes))
-    print "number of dest_nodes - src_nodes: " + str(len(dest_nodes - src_nodes))
-    print "number of all edges: " + str(network_df.shape[0])
+	src_nodes = set(np.unique(network_df.src.values))
+	dest_nodes = set(np.unique(network_df.dest.values))
+	print "number of all nodes: " + str(len(src_nodes | dest_nodes))
+	print "number of src nodes: " + str(np.unique(network_df.src.values).shape[0])
+	print "number of dest nodes: " + str(np.unique(network_df.dest.values).shape[0])
+	print "number of src_nodes - dest_nodes: " + str(len(src_nodes - dest_nodes))
+	print "number of dest_nodes - src_nodes: " + str(len(dest_nodes - src_nodes))
+	print "number of all edges: " + str(network_df.shape[0])
 ### END - print_stat
 
 
@@ -30,71 +31,72 @@ def mark_clusters():
 		network DataFrame containing cluster information
 
 	"""
-    network = pd.read_table("../breast_cancer_corr_essential_marked", sep='\t', header=0, index_col=0)
+	network = pd.read_table("../breast_cancer_corr_essential_marked", sep='\t', header=0, index_col=0)
 
-    # mark case (c) clusters
-    for c in range(1, 4):
-        df_c = pd.read_table('../clusters/mini_c{0}.txt'.format(c), sep='\t', header=None, names=['gene'])
-        df_c = df_c['gene'].str.split(':', expand=True)
-        df_c.columns = ['gene', 'cell']
-        print "df_c" + str(c) 
-        
-        
-        diff_set = set(df_c.gene.values) - set(network.src.values)
-        
-        if len(diff_set) != 0:
-            for gene in diff_set:
-                row = pd.Series(np.zeros((network.shape[1], ), dtype=object), index=network.columns)
-                row['src'] = gene
-                row['dest'] = None
-                network = network.append(row, ignore_index=True)
-            ### END - for
-        ### END - if
-        
-        print "difference " + str(len(diff_set))
-        
-        c_col = np.zeros(network.shape[0], dtype=np.int32)
-        for idx, row in network.iterrows():
-            if row.src in df_c.gene.values:
-                c_col[idx] = 1
-        ### END - for
+	# mark case (c) clusters
+	for c in range(1, 4):
+		df_c = pd.read_table('../clusters/mini_c{0}.txt'.format(c), sep='\t', header=None, names=['gene'])
+		df_c = df_c['gene'].str.split(':', expand=True)
+		df_c.columns = ['gene', 'cell']
+		
+		print "df_c" + str(c) 
 
-        network['c{0}'.format(c)] = c_col
-    ### END - for
-    
-    # mark feature (f) clusters
-    network['f'] = np.zeros(network.shape[0], dtype=np.int32)  # make new column
 
-    for f in range(1, 6):
-        df_f = pd.read_table('../clusters/mini_f{0}.txt'.format(f), sep='\t', header=None, names=['gene', 'cluster'])
-        diff_set = set(df_f.gene.values) - set(network.src.values)
-        
-        if len(diff_set) != 0:
-            for gene in diff_set:
-                row = pd.Series(np.zeros((network.shape[1], ), dtype=object), index=network.columns)
-                row['src'] = gene
-                row['dest'] = None
-                network = network.append(row, ignore_index=True)
-        	### END - for
-        ### END - if
-        print "difference " + str(len(diff_set))
-        
-        for idx, row in network.iterrows():
-            if row.src in df_f.gene.values:
-                network.at[idx, 'f'] = f
-        ### END - for
-    ### END - for
-    
-    # mark intersection of case and feature clusters
-    for c in range(1, 4):
-        for f in range(1, 6):
-            idx = network[(network['c{0}'.format(c)] == 1) | (network['f'] == f)].index
-            col = np.zeros(network.shape[0], dtype=np.int32)
-            col[idx] = 1
-            network['c{0}f{1}'.format(c, f)] = col
-        ### END - for
-    ### END - for
-    return network
+		diff_set = set(df_c.gene.values) - set(network.src.values)
+
+		if len(diff_set) != 0:
+			for gene in diff_set:
+				row = pd.Series(np.zeros((network.shape[1], ), dtype=object), index=network.columns)
+				row['src'] = gene
+				row['dest'] = None
+				network = network.append(row, ignore_index=True)
+		    ### END - for
+		### END - if
+
+		print "difference " + str(len(diff_set))
+
+		c_col = np.zeros(network.shape[0], dtype=np.int32)
+		for idx, row in network.iterrows():
+			if row.src in df_c.gene.values:
+				c_col[idx] = 1
+		### END - for
+
+		network['c{0}'.format(c)] = c_col
+	### END - for
+
+	# mark feature (f) clusters
+	network['f'] = np.zeros(network.shape[0], dtype=np.int32)  # make new column
+
+	for f in range(1, 6):
+		df_f = pd.read_table('../clusters/mini_f{0}.txt'.format(f), sep='\t', header=None, names=['gene', 'cluster'])
+		diff_set = set(df_f.gene.values) - set(network.src.values)
+
+		if len(diff_set) != 0:
+			for gene in diff_set:
+				row = pd.Series(np.zeros((network.shape[1], ), dtype=object), index=network.columns)
+				row['src'] = gene
+				row['dest'] = None
+				network = network.append(row, ignore_index=True)
+			### END - for
+		### END - if
+		print "difference " + str(len(diff_set))
+
+		for idx, row in network.iterrows():
+			if row.src in df_f.gene.values:
+				network.at[idx, 'f'] = f
+	    ### END - for
+	### END - for
+
+	# mark intersection of case and feature clusters
+	for c in range(1, 4):
+		for f in range(1, 6):
+			idx = network[(network['c{0}'.format(c)] == 1) | (network['f'] == f)].index
+			col = np.zeros(network.shape[0], dtype=np.int32)
+			col[idx] = 1
+			network['c{0}f{1}'.format(c, f)] = col
+	    ### END - for
+	### END - for
+	return network
 ### END - mark_clusters
 
 
@@ -109,12 +111,36 @@ def construct_node_df(G):
 
 	"""
 	df = pd.read_table('../breast_cancer_cluster_marked_cf', sep='\t', header=0, index_col=0)
+	#print df.head()
+
+	# append nodes that exist only in dest (leaf nodes)
+	src_nodes = set(np.unique(df.src.values))
+	dest_nodes = set(np.unique(df.dest.values))
+	leaves = dest_nodes - src_nodes
+	leaves.discard(np.nan)
+	leaves_len = len(leaves)
+
+	leaves_dic = {'src' : list(leaves),
+	               'c1' : np.zeros(leaves_len, dtype=np.int32),
+	               'c2' : np.zeros(leaves_len, dtype=np.int32),
+	               'c3' : np.zeros(leaves_len, dtype=np.int32),
+	               'f'  : np.zeros(leaves_len, dtype=np.int32)}
+
+	for c in range(1, 4):
+		for f in range(1, 6):
+			leaves_dic['c{0}f{1}'.format(c, f)] = np.zeros(leaves_len, dtype=np.int32)
+
+	leaves_df = pd.DataFrame(leaves_dic)
+
 	df.drop_duplicates(subset='src', inplace=True)
 	df.drop(['dest', 'r', 'p'], axis=1, inplace=True)
+	df = df.append(leaves_df, ignore_index=True) # append leaf nodes
 	df.set_index('src', inplace=True)
+
 	# remove node that are not in the main connected component
 	to_be_removed = isolated_nodes(G)
 	df.drop(list(to_be_removed), axis=0, inplace=True)
+
 	return df
 ### END - construct_node_df
 
@@ -210,18 +236,72 @@ def centrality(G):
 	return in_degree, out_degree, closeness, betweenness
 ### END - centrality
 
-def main():
+
+def pairwise_shortest_path(G, node_list):
+	""" Calculate pairwise shortest path length for given nodes (node_list) in graph G. 
+	If a path exists in either way, use that path length. 
+	If no path exists, use np.inf as length.
+
+	args:
+		G (NetworkX graph) : directed or undirected graph
+		node_list (list) : list of nodes to calculate pairwise shortest length
+
+	returns:
+		list of shortest path lengts in unrolled fasion
+
+	"""
+	list_len = len(node_list)
+	path_len_list = []
+	for i in range(list_len):
+		for k in range(i+1, list_len):
+			n1 = node_list[i]
+			n2 = node_list[k]
+			try:
+				length = nx.shortest_path_length(G, source=n1, target=n2, weight=None)
+			except nx.NetworkXNoPath:
+				try:
+					length = nx.shortest_path_length(G, source=n2, target=n1, weight=None)
+				except nx.NetworkXNoPath:
+					length = np.inf
+			path_len_list.append(length)
+		### END - for k
+	### END - for i
+	return path_len_list
+### pairwise_shortest_path
+
+def compare_distance():
 	G = construct_graph()
-	in_degree, out_degree, closeness, betweenness = centrality(G)
-	node_df = construct_node_df(G)
-	node_df['in_central'] = pd.Series(in_degree)
-	node_df['out_central'] = pd.Series(out_degree)
-	node_df['close'] = pd.Series(closeness)
-	node_df['between'] = pd.Series(betweenness)
-	node_df.to_csv('breast_cancer_node_df', sep='\t')
+	df = pd.read_table('../breast_cancer_all_node_df', sep='\t', header=0, index_col=None)
+	
+	all_nodes = df.src.values
+	len_df = pd.DataFrame()
+	for c in range(1, 4):
+		for f in range(1, 6):
+			cluster = df[df['c{0}f{1}'.format(c, f)] == 1]['src'].values
+			random_nodes = list(shuffle(all_nodes, n_samples=cluster.shape[0]))
+			
+			len_df['c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, list(cluster)))
+			len_df['rand_c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, random_nodes))
+		### END - for f
+	### END - for c
+	return len_df
+### END - compare_distance
+
+def main():
+	#G = construct_graph()
+	#print len(G)
+	#in_degree, out_degree, closeness, betweenness = centrality(G)
+	#print len(closeness.keys())
+	#node_df = construct_node_df(G)
+	#node_df['in_central'] = pd.Series(in_degree)
+	#node_df['out_central'] = pd.Series(out_degree)
+	#node_df['close'] = pd.Series(closeness)
+	#node_df['between'] = pd.Series(betweenness)
+	#node_df.to_csv('breast_cancer_all_node_df', sep='\t')
+	compare_distance()
 ### END - main
 
-def mark_essentiality(gene_df, ess_file, non_file):
+#def mark_essentiality(gene_df, ess_file, non_file):
 
 if __name__ == "__main__":
 	main()
