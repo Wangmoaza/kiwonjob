@@ -269,23 +269,64 @@ def pairwise_shortest_path(G, node_list):
 	return path_len_list
 ### pairwise_shortest_path
 
-def compare_distance():
-	G = construct_graph()
-	df = pd.read_table('../breast_cancer_all_node_df', sep='\t', header=0, index_col=None)
+def cal_distance(G, node_df, n_cases=4, n_features=6, random=False):
+	""" Calcualtes pairwise distance fo each cluster.
+	args:
+		G (NetworkX Graph) : graph containing nodes in node_df
+		node_df (Pandas DataFrame) : node_df should contain src, cf clusters (ex. c1f1, c1f2) columns
+		n_cases (int) : default=4. number of cases for clusters
+		n_features (int) : default=6, number of features for clusters
+		random (bool) : if True, select random nodes which the count is equal to 
+		                 the corresponding cluster
 	
+	returns:
+		a dataframe that contains pairwise distance for each cluster
+	"""
+	df = node_df
 	all_nodes = df.src.values
 	len_df = pd.DataFrame()
-	for c in range(1, 4):
-		for f in range(1, 6):
+	for c in range(1, n_cases):
+		for f in range(1, n_features):
 			cluster = df[df['c{0}f{1}'.format(c, f)] == 1]['src'].values
-			random_nodes = list(shuffle(all_nodes, n_samples=cluster.shape[0]))
-			
-			len_df['c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, list(cluster)))
-			len_df['rand_c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, random_nodes))
+			if not random:
+				len_df['c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, list(cluster)))
+			else:
+				random_nodes = list(shuffle(all_nodes, n_samples=cluster.shape[0]))
+				len_df['rand_c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, random_nodes))
 		### END - for f
 	### END - for c
 	return len_df
 ### END - compare_distance
+
+
+def path_exist_ratio(len_list):
+	len_arr = np.array(len_list)
+	return len_arr[len_arr != np.inf].shape[0] / float(len(len_list))
+
+
+def construct_ratio_df(G, node_df, n_cases=4, n_features=6, n_repeat=1000, verbose=False):
+	df = node_df
+	all_nodes = df.src.values
+	ratio_df = pd.DataFrame()
+	if verbose:
+		print "construct_ratio_df..."
+	for c in range(1, n_cases):
+		for f in range(1, n_features):
+			if verbose:
+				print "running for c{0}f{1}...".format(c, f)
+			ratio_list = []
+			for n in range(n_repeat):
+				cluster = df[df['c{0}f{1}'.format(c, f)] == 1]['src'].values
+				random_nodes = list(shuffle(all_nodes, n_samples=cluster.shape[0], random_state=n))
+				len_list = pairwise_shortest_path(G, random_nodes)
+				ratio_list.append(path_exist_ratio(len_list))
+			### END - for n
+			ratio_df['rand_c{0}f{1}'.format(c, f)] = pd.Series(ratio_list)
+		### END - for f
+	### END - for c
+	return ratio_df
+### END - construct_ratio_df
+
 
 def main():
 	#G = construct_graph()
@@ -298,7 +339,11 @@ def main():
 	#node_df['close'] = pd.Series(closeness)
 	#node_df['between'] = pd.Series(betweenness)
 	#node_df.to_csv('breast_cancer_all_node_df', sep='\t')
-	compare_distance()
+	df = pd.read_table('../breast_cancer_all_node_df', sep='\t', header=0, index_col=None)
+	G = construct_graph()
+	ratio_df = construct_ratio_df(G, df, verbose=True)
+	ratio_df.to_csv('../rand_path_exist_ratio', sep='\t')
+	#len_df = compare_distance()
 ### END - main
 
 #def mark_essentiality(gene_df, ess_file, non_file):

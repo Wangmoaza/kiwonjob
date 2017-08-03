@@ -10,6 +10,7 @@ Helping Kiwon
 * *deep_input_c3_pert_v2LogN* : cut off 3
 * *deep_input_c3_pert_v2LogN_top* : contains only features with high variance
 * *deep_input_c3_pert_v2LogN_top_cs_3x* : plus case selection
+* *rand_path_exist_ttest_result* : one-sample t-test result of randomly chosen nodes (n_samples=1000) corresponding to cluster nodes 
 
 #### files made by me
 
@@ -50,6 +51,11 @@ Visualized cluster c2f4 with cytoscape
 
 * fixed node_df to include all nodes (leaf nodes too). saved in file breast_cancer_all_nodes_df
 * fixed pairwise distance calculation
+
+#### 2017-08-03
+
+* one-sample t-test on path existance ratio of randomly chosen nodes corresponding to each cluster. All significantly different. Saved in the file rand_path_exist_ttest_result.txt.
+
 
 #### TODO
 
