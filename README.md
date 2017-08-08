@@ -10,8 +10,8 @@ Helping Kiwon
 * *deep_input_c3_pert_v2LogN* : cut off 3
 * *deep_input_c3_pert_v2LogN_top* : contains only features with high variance
 * *deep_input_c3_pert_v2LogN_top_cs_3x* : plus case selection
-* *Gene_c3_top_case_3x_relu_1_T_0.5_3.tsv* : predicted essential genes
-* *Gene_c3_top_case_3x_relu_1_N_0.5_3.tsv* : prdicted false essential genes
+* *Gene_c3_top_case_3x_relu_1_T_0.5_3.tsv* : normal predicted essential genes
+* *Gene_c3_top_case_3x_relu_1_N_0.5_3.tsv* : tumor predicted essential genes
 
 #### files made by me
 

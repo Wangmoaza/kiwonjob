@@ -332,10 +332,11 @@ def construct_ratio_df(G, node_df, n_cases=4, n_features=6, n_repeat=1000, verbo
 
 
 def set_essentiality(G):
-	""" Set essentiality attribute to nodes. The attribute value is either 0, 1, None.
+	""" Sets essentiality attribute to nodes. The attribute value is either 0, 1, None.
 
 	args:
 		G (NetworkX Graph)
+
 	"""
 	df = pd.read_table('../all_node_essentiality.tsv', sep='\t', header=0, index_col=0)
 	for ess in df.columns:
@@ -343,17 +344,10 @@ def set_essentiality(G):
 ### END - set_essentiality
 
 
-def main():
-	#G = construct_graph()
-	#print len(G)
-	#in_degree, out_degree, closeness, betweenness = centrality(G)
-	#print len(closeness.keys())
-	#node_df = construct_node_df(G)
-	#node_df['in_central'] = pd.Series(in_degree)
-	#node_df['out_central'] = pd.Series(out_degree)
-	#node_df['close'] = pd.Series(closeness)
-	#node_df['between'] = pd.Series(betweenness)
-	#node_df.to_csv('breast_cancer_all_node_df', sep='\t')
+def ess_path_ratio():
+	""" Calculates path existence ratio for essential and non-essential gene group.
+	Both directed and undirected paths are calculated.
+	"""
 	ess_df = pd.read_table('../all_node_essentiality.tsv', sep='\t', header=0, index_col=0)
 	G_direct = construct_graph(set_cluster=False)
 	G_undirect = G_direct.to_undirected()
@@ -369,8 +363,36 @@ def main():
 			non_path = pairwise_shortest_path(G, ess_df[ess_df[col] == 0].index)
 			print "{0}\tess\t{1}\t{2}".format(col, direct, path_exist_ratio(ess_path))
 			print "{0}\tnon\t{1}\t{2}".format(col, direct, path_exist_ratio(non_path))
+		### END - for col
+	### END - for direct
+### END - ess_path_ratio
 
 
+def main():
+	#G = construct_graph()
+	#print len(G)
+	#in_degree, out_degree, closeness, betweenness = centrality(G)
+	#print len(closeness.keys())
+	#node_df = construct_node_df(G)
+	#node_df['in_central'] = pd.Series(in_degree)
+	#node_df['out_central'] = pd.Series(out_degree)
+	#node_df['close'] = pd.Series(closeness)
+	#node_df['between'] = pd.Series(betweenness)
+	#node_df.to_csv('breast_cancer_all_node_df', sep='\t')
+	ess_df = pd.read_table('../all_node_essentiality.tsv', sep='\t', header=0, index_col=0)
+	G_direct = construct_graph(set_cluster=False)
+	#G_undirect = G_direct.to_undirected()
+	path_df = pd.DataFrame()
+	#set_essentiality(G)
+	for col in ess_df.columns:
+		print "running for {0}...".format(col)
+		ess_path = pairwise_shortest_path(G_direct, ess_df[ess_df[col] == 1].index)
+		path_df[col] = pd.Series(ess_path)
+		if 'pred' not in col:
+			non_path = pairwise_shortest_path(G_direct, ess_df[ess_df[col] == 0].index)
+			path_df[col[:-3] + 'non'] = pd.Series(non_path)
+	### END - for col
+	path_df.to_csv('../directed_path_length_essentiality.tsv', sep='\t')
 	#ratio_df = construct_ratio_df(G, df, verbose=True)
 	#ratio_df.to_csv('../rand_path_exist_ratio', sep='\t')
 	#len_df = compare_distance()
