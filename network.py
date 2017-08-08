@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import networkx as nx
 from sklearn.utils import shuffle
+
 
 def print_stat(network_df):
 	""" This method prints statistics of the network based on pandas DataFrame.
@@ -239,17 +239,19 @@ def centrality(G):
 
 def pairwise_shortest_path(G, node_list):
 	""" Calculate pairwise shortest path length for given nodes (node_list) in graph G. 
-	If a path exists in either way, use that path length. 
+	If a path exists in either way, use that path length. Every edge is considered as length 1.
 	If no path exists, use np.inf as length.
 
 	args:
 		G (NetworkX graph) : directed or undirected graph
-		node_list (list) : list of nodes to calculate pairwise shortest length
+		node_list (list-like obj) : list of nodes to calculate pairwise shortest length
 
 	returns:
 		list of shortest path lengts in unrolled fasion
 
 	"""
+
+	node_list = list(node_list)
 	list_len = len(node_list)
 	path_len_list = []
 	for i in range(list_len):
@@ -302,6 +304,7 @@ def cal_distance(G, node_df, n_cases=4, n_features=6, random=False):
 def path_exist_ratio(len_list):
 	len_arr = np.array(len_list)
 	return len_arr[len_arr != np.inf].shape[0] / float(len(len_list))
+### END - path_exist_ratio
 
 
 def construct_ratio_df(G, node_df, n_cases=4, n_features=6, n_repeat=1000, verbose=False):
@@ -328,6 +331,18 @@ def construct_ratio_df(G, node_df, n_cases=4, n_features=6, n_repeat=1000, verbo
 ### END - construct_ratio_df
 
 
+def set_essentiality(G):
+	""" Set essentiality attribute to nodes. The attribute value is either 0, 1, None.
+
+	args:
+		G (NetworkX Graph)
+	"""
+	df = pd.read_table('../all_node_essentiality.tsv', sep='\t', header=0, index_col=0)
+	for ess in df.columns:
+		nx.set_node_attributes(G, ess, df[ess].T.to_dict())
+### END - set_essentiality
+
+
 def main():
 	#G = construct_graph()
 	#print len(G)
@@ -339,10 +354,25 @@ def main():
 	#node_df['close'] = pd.Series(closeness)
 	#node_df['between'] = pd.Series(betweenness)
 	#node_df.to_csv('breast_cancer_all_node_df', sep='\t')
-	df = pd.read_table('../breast_cancer_all_node_df', sep='\t', header=0, index_col=None)
-	G = construct_graph()
-	ratio_df = construct_ratio_df(G, df, verbose=True)
-	ratio_df.to_csv('../rand_path_exist_ratio', sep='\t')
+	ess_df = pd.read_table('../all_node_essentiality.tsv', sep='\t', header=0, index_col=0)
+	G_direct = construct_graph(set_cluster=False)
+	G_undirect = G_direct.to_undirected()
+	#set_essentiality(G)
+	for direct in ['directed', 'undirected']:
+		for col in ess_df.columns:
+			if direct == 'undirected':
+				G = G_undirect
+			else:
+				G = G_direct
+			print "running {0} {1}...".format(direct, col)
+			ess_path = pairwise_shortest_path(G, ess_df[ess_df[col] == 1].index)
+			non_path = pairwise_shortest_path(G, ess_df[ess_df[col] == 0].index)
+			print "{0}\tess\t{1}\t{2}".format(col, direct, path_exist_ratio(ess_path))
+			print "{0}\tnon\t{1}\t{2}".format(col, direct, path_exist_ratio(non_path))
+
+
+	#ratio_df = construct_ratio_df(G, df, verbose=True)
+	#ratio_df.to_csv('../rand_path_exist_ratio', sep='\t')
 	#len_df = compare_distance()
 ### END - main
 

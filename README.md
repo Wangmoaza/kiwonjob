@@ -10,7 +10,8 @@ Helping Kiwon
 * *deep_input_c3_pert_v2LogN* : cut off 3
 * *deep_input_c3_pert_v2LogN_top* : contains only features with high variance
 * *deep_input_c3_pert_v2LogN_top_cs_3x* : plus case selection
-* *rand_path_exist_ttest_result* : one-sample t-test result of randomly chosen nodes (n_samples=1000) corresponding to cluster nodes 
+* *Gene_c3_top_case_3x_relu_1_T_0.5_3.tsv* : predicted essential genes
+* *Gene_c3_top_case_3x_relu_1_N_0.5_3.tsv* : prdicted false essential genes
 
 #### files made by me
 
@@ -18,8 +19,12 @@ Helping Kiwon
 *  *breast_cancer_node_df* : node data frame of network. cluster marked, centrality calculated.
 *  *breast_cancer_node_df_central_ess_marked* : src / centralities... / c1_ess/ c3_ess / c3_cs_ess
 *  *breast_cancer_all_nodes_df* : breast_cancer_nodes_df does not include leaf nodes in the network. This file does.
+* *rand_path_exist_ttest_result* : one-sample t-test result of randomly chosen nodes (n_samples=1000) corresponding to cluster nodes
+* *all_node_centrality.tsv* : in-degree, out-degree, closeness, betweeness centrality of all nodes
+* *all_node_essentiality.tsv* : c1, c3, c3_cs, tumor predicted, normal predicted essentiality of all nodes in the network
 
 ## lab note by date
+
 #### 2017-07-21
 
 Visualized cluster c2f4 with cytoscape
@@ -56,6 +61,9 @@ Visualized cluster c2f4 with cytoscape
 
 * one-sample t-test on path existance ratio of randomly chosen nodes corresponding to each cluster. All significantly different. Saved in the file rand_path_exist_ttest_result.txt.
 
+#### 2017-08-07
+
+* calculating path existence ratio grouped by essentiality (c1, c3, c3_ess, normal_predicted, tumor_predicted)
 
 #### TODO
 
