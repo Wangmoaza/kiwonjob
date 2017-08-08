@@ -22,6 +22,10 @@ Helping Kiwon
 * *rand_path_exist_ttest_result* : one-sample t-test result of randomly chosen nodes (n_samples=1000) corresponding to cluster nodes
 * *all_node_centrality.tsv* : in-degree, out-degree, closeness, betweeness centrality of all nodes
 * *all_node_essentiality.tsv* : c1, c3, c3_cs, tumor predicted, normal predicted essentiality of all nodes in the network
+* *directed_path_length_essentiality.tsv* : directed pairwise distances within group (c1, c3, c3_cs, normal predicted, tumor predicted). Excluded infinite values.
+* *directed_path_length_essentiality_for_r.tsv* : converted dataframe in the layout group, distance. For easy use in R
+* *undirected_path_length_essentiality.tsv* : directed pairwise distances within group (c1, c3, c3_cs, normal predicted, tumor predicted). Included infinite values.
+* *undirected_path_length_essentiality_for_r.tsv* : equivelent of directed version.
 
 ## lab note by date
 
@@ -64,6 +68,12 @@ Visualized cluster c2f4 with cytoscape
 #### 2017-08-07
 
 * calculating path existence ratio grouped by essentiality (c1, c3, c3_ess, normal_predicted, tumor_predicted)
+
+#### 2017-08-08
+
+* calculated undirected path length within each group.
+* calculated directed path length within each group.
+* plotted (boxplot, frequency polygon) the results. 
 
 #### TODO
 

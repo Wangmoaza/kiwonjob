@@ -387,9 +387,13 @@ def main():
 	for col in ess_df.columns:
 		print "running for {0}...".format(col)
 		ess_path = pairwise_shortest_path(G_direct, ess_df[ess_df[col] == 1].index)
+		ess_path = np.array(ess_path)
+		ess_path = ess_path[ess_path != np.inf]  # exclude infinite values
 		path_df[col] = pd.Series(ess_path)
 		if 'pred' not in col:
 			non_path = pairwise_shortest_path(G_direct, ess_df[ess_df[col] == 0].index)
+			non_path = np.array(non_path)
+			non_path = non_path[non_path != np.inf]  # exclude infinite values
 			path_df[col[:-3] + 'non'] = pd.Series(non_path)
 	### END - for col
 	path_df.to_csv('../directed_path_length_essentiality.tsv', sep='\t')
