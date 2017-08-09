@@ -237,27 +237,36 @@ def centrality(G):
 ### END - centrality
 
 
-def pairwise_shortest_path(G, node_list):
+def pairwise_distance(G, node_list, another_list=None):
 	""" Calculate pairwise shortest path length for given nodes (node_list) in graph G. 
 	If a path exists in either way, use that path length. Every edge is considered as length 1.
-	If no path exists, use np.inf as length.
+	If no path exists, use np.inf as length. If another_list is given, calculate distances
+	between the nodes in node_list and the nodes in another_list.
 
 	args:
 		G (NetworkX graph) : directed or undirected graph
 		node_list (list-like obj) : list of nodes to calculate pairwise shortest length
+		another_list (list-like obj) : default None.
 
 	returns:
 		list of shortest path lengts in unrolled fasion
 
 	"""
 
-	node_list = list(node_list)
-	list_len = len(node_list)
+	if another_list is None:
+		ls = list(node_list)
+	else:
+		ls = list(set(node_list) & set(another_list))
+		node_list = list(node_list)
+		another_list = list(another_list)
+
+	# calculate within-list pairwise distance
+	list_len = len(ls)
 	path_len_list = []
 	for i in range(list_len):
 		for k in range(i+1, list_len):
-			n1 = node_list[i]
-			n2 = node_list[k]
+			n1 = ls[i]
+			n2 = ls[k]
 			try:
 				length = nx.shortest_path_length(G, source=n1, target=n2, weight=None)
 			except nx.NetworkXNoPath:
@@ -268,8 +277,29 @@ def pairwise_shortest_path(G, node_list):
 			path_len_list.append(length)
 		### END - for k
 	### END - for i
+
+	# calculate two seperate list pairwise distance
+	# for instance, if list 1 comprises of A, B, C and list 2 a, b, C
+	# calculate A-a, B-a, C-a, A-b, B-b, C-b distance
+	if another_list is not None:
+		for n1 in node_list:
+			for n2 in another_list:
+				# if both are in two list's intersection, distance is already calculated
+				if (n1 in ls) and (n2 in ls):
+					continue
+				try:
+					length = nx.shortest_path_length(G, source=n1, target=n2, weight=None)
+				except nx.NetworkXNoPath:
+					try:
+						length = nx.shortest_path_length(G, source=n2, target=n1, weight=None)
+					except nx.NetworkXNoPath:
+						length = np.inf
+				path_len_list.append(length)
+			### END - for n2
+		### END - for n1
+	### END - if
 	return path_len_list
-### pairwise_shortest_path
+### pairwise_distance
 
 def cal_distance(G, node_df, n_cases=4, n_features=6, random=False):
 	""" Calcualtes pairwise distance fo each cluster.
@@ -291,10 +321,10 @@ def cal_distance(G, node_df, n_cases=4, n_features=6, random=False):
 		for f in range(1, n_features):
 			cluster = df[df['c{0}f{1}'.format(c, f)] == 1]['src'].values
 			if not random:
-				len_df['c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, list(cluster)))
+				len_df['c{0}f{1}'.format(c, f)] = pd.Series(pairwise_distance(G, list(cluster)))
 			else:
 				random_nodes = list(shuffle(all_nodes, n_samples=cluster.shape[0]))
-				len_df['rand_c{0}f{1}'.format(c, f)] = pd.Series(pairwise_shortest_path(G, random_nodes))
+				len_df['rand_c{0}f{1}'.format(c, f)] = pd.Series(pairwise_distance(G, random_nodes))
 		### END - for f
 	### END - for c
 	return len_df
@@ -321,7 +351,7 @@ def construct_ratio_df(G, node_df, n_cases=4, n_features=6, n_repeat=1000, verbo
 			for n in range(n_repeat):
 				cluster = df[df['c{0}f{1}'.format(c, f)] == 1]['src'].values
 				random_nodes = list(shuffle(all_nodes, n_samples=cluster.shape[0], random_state=n))
-				len_list = pairwise_shortest_path(G, random_nodes)
+				len_list = pairwise_distance(G, random_nodes)
 				ratio_list.append(path_exist_ratio(len_list))
 			### END - for n
 			ratio_df['rand_c{0}f{1}'.format(c, f)] = pd.Series(ratio_list)
@@ -359,8 +389,8 @@ def ess_path_ratio():
 			else:
 				G = G_direct
 			print "running {0} {1}...".format(direct, col)
-			ess_path = pairwise_shortest_path(G, ess_df[ess_df[col] == 1].index)
-			non_path = pairwise_shortest_path(G, ess_df[ess_df[col] == 0].index)
+			ess_path = pairwise_distance(G, ess_df[ess_df[col] == 1].index)
+			non_path = pairwise_distance(G, ess_df[ess_df[col] == 0].index)
 			print "{0}\tess\t{1}\t{2}".format(col, direct, path_exist_ratio(ess_path))
 			print "{0}\tnon\t{1}\t{2}".format(col, direct, path_exist_ratio(non_path))
 		### END - for col
@@ -382,21 +412,45 @@ def main():
 	ess_df = pd.read_table('../all_node_essentiality.tsv', sep='\t', header=0, index_col=0)
 	G_direct = construct_graph(set_cluster=False)
 	#G_undirect = G_direct.to_undirected()
-	path_df = pd.DataFrame()
+	path_df = pd.read_table('../directed_path_length_essentiality.tsv', sep='\t', header=0, index_col=0)
 	#set_essentiality(G)
-	for col in ess_df.columns:
-		print "running for {0}...".format(col)
-		ess_path = pairwise_shortest_path(G_direct, ess_df[ess_df[col] == 1].index)
-		ess_path = np.array(ess_path)
-		ess_path = ess_path[ess_path != np.inf]  # exclude infinite values
-		path_df[col] = pd.Series(ess_path)
-		if 'pred' not in col:
-			non_path = pairwise_shortest_path(G_direct, ess_df[ess_df[col] == 0].index)
-			non_path = np.array(non_path)
-			non_path = non_path[non_path != np.inf]  # exclude infinite values
-			path_df[col[:-3] + 'non'] = pd.Series(non_path)
-	### END - for col
+	
+	# make sets
+	ess_set = set(ess_df[ess_df['c3_cs_ess'] == 1].index)
+	non_set = set(ess_df[ess_df['c3_cs_ess'] == 0].index)
+	pred_set = set(ess_df[ess_df['tumor_pred_ess'] == 1].index)
+
+	print "for ess_non"
+	print "only in ess " + str(len(ess_set - non_set))
+	print "only in non " + str(len(non_set - ess_set))
+	print "intersection " + str(len(ess_set & non_set))
+
+	print "for ess_pred"
+	print "only in ess " + str(len(ess_set - pred_set))
+	print "only in pred " + str(len(pred_set - ess_set))
+	print "intersection " + str(len(ess_set & pred_set))
+	
+	#print "running for {0}...".format(col)
+	ess_non_path = pairwise_distance(G_direct, list(ess_set), another_list=list(non_set))
+	ess_non_path = np.array(ess_non_path)
+	print "ess_non_path existence ratio " + str(path_exist_ratio(ess_non_path))
+	ess_non_path = ess_non_path[ess_non_path != np.inf]  # exclude infinite values
+	path_df['c3_cs_ess_non'] = pd.Series(ess_non_path)
+	
+	ess_pred_path = pairwise_distance(G_direct, list(ess_set), another_list=list(pred_set))
+	ess_pred_path = np.array(ess_pred_path)
+	print "ess_pred_path existence ratio " + str(path_exist_ratio(ess_pred_path))
+	ess_pred_path = ess_pred_path[ess_pred_path != np.inf]  # exclude infinite values
+	path_df['c3_cs_ess_tumor_pred'] = pd.Series(ess_pred_path)
+	
 	path_df.to_csv('../directed_path_length_essentiality.tsv', sep='\t')
+	#if 'pred' not in col:
+	#	non_path = pairwise_distance(G_direct, ess_df[ess_df[col] == 0].index)
+	#	non_path = np.array(non_path)
+		#non_path = non_path[non_path != np.inf]  # exclude infinite values
+	#	path_df[col[:-3] + 'non'] = pd.Series(non_path)
+	### END - for col
+	#path_df.to_csv('../undirected_path_length_essentiality.tsv', sep='\t')
 	#ratio_df = construct_ratio_df(G, df, verbose=True)
 	#ratio_df.to_csv('../rand_path_exist_ratio', sep='\t')
 	#len_df = compare_distance()

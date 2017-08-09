@@ -1,5 +1,6 @@
 # kiwonjob
-Helping Kiwon
+Helping Kiwon.
+The source codes for the project can be cloned from GitHub repository [here](https://github.com/Wangmoaza/kiwonjob).
 
 ## file description
 
@@ -22,9 +23,9 @@ Helping Kiwon
 * *rand_path_exist_ttest_result* : one-sample t-test result of randomly chosen nodes (n_samples=1000) corresponding to cluster nodes
 * *all_node_centrality.tsv* : in-degree, out-degree, closeness, betweeness centrality of all nodes
 * *all_node_essentiality.tsv* : c1, c3, c3_cs, tumor predicted, normal predicted essentiality of all nodes in the network
-* *directed_path_length_essentiality.tsv* : directed pairwise distances within group (c1, c3, c3_cs, normal predicted, tumor predicted). Excluded infinite values.
-* *directed_path_length_essentiality_for_r.tsv* : converted dataframe in the layout group, distance. For easy use in R
-* *undirected_path_length_essentiality.tsv* : directed pairwise distances within group (c1, c3, c3_cs, normal predicted, tumor predicted). Included infinite values.
+* *directed_path_length_essentiality.tsv* : directed pairwise distances within group (c1, c3, c3_cs, normal predicted, tumor predicted, c3_cs_ess_non, c3_cs_ess_tumor_pred). Excluded infinite values.
+* *directed_path_length_essentiality_for_r.tsv* : converted dataframe in the column layout [group, distance]. For easy use in R
+* *undirected_path_length_essentiality.tsv* : directed pairwise distances within group (c1, c3, c3_cs, normal predicted, tumor predicted, c3_cs_ess_non, c3_cs_ess_tumor_pred). Included infinite values.
 * *undirected_path_length_essentiality_for_r.tsv* : equivelent of directed version.
 
 ## lab note by date
@@ -73,7 +74,20 @@ Visualized cluster c2f4 with cytoscape
 
 * calculated undirected path length within each group.
 * calculated directed path length within each group.
-* plotted (boxplot, frequency polygon) the results. 
+* plotted (boxplot, frequency polygon) the results.
+* Even though boxplot and frequency polygon looks very similar, when t-test is performed between essential and non-essential, their means were significantly different. May be due to very large sample size.
+
+#### 2017-08-09
+
+* calculated directed and undirected distances between nodes in two groups.
+* c3_cs_essential - c3_cs_non-essential, c3_cs_essential - tumor predicted essential distances were measured. Then, plotted the results with boxplot and frequency polygon to compare the results between the above two and c3_cs_essential within-group distances.
+* The results were against expectation. There were no visible differences between the groups. Only directed path existence ratio was as expected. The values are in the file ess_network_path_result.xlsx.
+
+
+* performed one-tailed t-test of c1_ess - c1_non, c3_cs_ess_non - c3_cs_ess_tumor_pred. Not sure if t-test is allowed since they are not from independent populations.
+
+
+* organizing results to send them to Kiwon.
 
 #### TODO
 
