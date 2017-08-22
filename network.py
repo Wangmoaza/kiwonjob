@@ -214,7 +214,8 @@ def isolated_nodes(G):
 
 def centrality(G):
 	""" Calculates the in-degree, out-degree, closeness, betweenness centrality
-	for the given graph.
+	for the given graph. If the graph is undirected, return empty dictionary for indegree
+	and outdegree centrality.
 
 	args:
 		G (nx.DiGraph) : input graph
@@ -224,14 +225,19 @@ def centrality(G):
 		that the keys are nodes.
 
 	"""
-	print "calculating in_degree centrality..."
-	in_degree = nx.in_degree_centrality(G)
-	print "calculating out_degree centrality..."
-	out_degree = nx.out_degree_centrality(G)
+	in_degree, out_degree = {}, {}
+
+	if G.is_directed():
+		print "calculating in_degree centrality..."
+		in_degree = nx.in_degree_centrality(G)
+		print "calculating out_degree centrality..."
+		out_degree = nx.out_degree_centrality(G)
+
 	print "calculating closeness centrality..."
 	closeness = nx.closeness_centrality(G)
 	print "calculating betweenness centrality..."
 	betweenness = nx.betweenness_centrality(G)
+
 
 	return in_degree, out_degree, closeness, betweenness
 ### END - centrality
