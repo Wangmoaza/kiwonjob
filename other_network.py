@@ -48,17 +48,10 @@ def main():
     G = construct_graph(df, directed=False)
     all_nodes = nx.nodes(G)
 
-    # centrality
-    in_degree, out_degree, closeness, between = centrality(G)
-    central_df = pd.DataFrame(index=all_nodes)
-    central_df['closeness'] = pd.Series(closeness)
-    central_df['between'] = pd.Series(between)
-    central_df.to_csv('../HumanNet_centrality.tsv', sep='\t')
-    
     # make essentiality dataframe
     node_df = pd.DataFrame(index=all_nodes)
     for c in ['c1', 'c3', 'c3_cs']:
-        node_df.loc[:, c + 'ess'] = None
+        node_df.loc[:, c + '_ess'] = None
         for ess in ['Essen', 'Non']:
             with open('../Input_{0}_{1}.txt'.format(ess, c), 'r') as f:
                 ls = f.read().split('\n')
