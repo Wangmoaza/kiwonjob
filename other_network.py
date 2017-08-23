@@ -43,7 +43,7 @@ def do_centrality():
 ### END - do_centrality
 
 def main():
-    df = pd.read_table('../HumanNet_all_uniq.txt', 
+    df = pd.read_table('../PPI_vidal_all_uniq.tsv', 
                 sep='\t', header=None, names=['src', 'dest'], index_col=None)
     G = construct_graph(df, directed=False)
     all_nodes = nx.nodes(G)
@@ -84,7 +84,7 @@ def main():
     ### END - for c
                         
     node_df.apply(pd.to_numeric, errors='coerce', downcast='integer')
-    node_df.to_csv('../HumanNet_essentiality.tsv', sep='\t')
+    node_df.to_csv('../ppi_essentiality.tsv', sep='\t')
 
 
 if __name__ == "__main__":

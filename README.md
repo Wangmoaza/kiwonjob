@@ -31,7 +31,10 @@ The source codes for the project can be cloned from GitHub repository [here](htt
 * *undirected_path_length_essentiality_for_r.tsv* : equivelent of directed version.
 * *ppi_centrality.tsv* : closeness, betweenness centrality information of all ppi network nodes
 *  *ppi_essentiality.tsv* : c1, c3, c3_cs, tumor predicted, normal predicted essentiality of all nodes in ppi network nodes
-*  
+* *ppi_centrality_t_test_result.txt* : two-sample t-test results. Used PPI network. The difference in mean was compared between essential and non-essential genes at different cutoffs. produced by R.
+* *ppi_centrality_wilcox_test_result.txt* : Wilcoxon rank-sum test results. Used PPI network. The difference in mean was compared between essential and non-essential genes at different cutoffs. produced by R.
+* *HumanNet_centrality_t_test_result.txt* : two-sample t-test results. Used HumanNet network. The difference in mean was compared between essential and non-essential genes at different cutoffs. produced by R.
+* *HumanNet_centrality_wilcox_test_result.txt* : Wilcoxon rank-sum test results. Used Humannet network. The difference in mean was compared between essential and non-essential genes at different cutoffs. produced by R.
 
 ## lab note by date
 
@@ -100,6 +103,11 @@ Visualized cluster c2f4 with cytoscape
 
 * calculated centralities for PPI network and HumanNet network
 * constructed dataframe having essentiality information for PPI and HumanNet.
+
+#### 2017-08-23
+
+* Wilcoxon Rank-sum test and t-test between essential and non-essential genes at diffent cutoff (c1, c3, c3_cs). Test results saved in files. Most of them were insignificant. Even if it were significant, the difference itself was minimal. Seems like there is no difference in centrality between essential and nonessential genes.
+* drew boxplot for each cutoff. Exported to pdf files.
 
 #### TODO
 
