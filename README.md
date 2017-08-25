@@ -109,6 +109,10 @@ Visualized cluster c2f4 with cytoscape
 * Wilcoxon Rank-sum test and t-test between essential and non-essential genes at diffent cutoff (c1, c3, c3_cs). Test results saved in files. Most of them were insignificant. Even if it were significant, the difference itself was minimal. Seems like there is no difference in centrality between essential and nonessential genes.
 * drew boxplot for each cutoff. Exported to pdf files.
 
+#### 2017-08-24
+
+* summarized results to presentation file
+
 #### TODO
 
 * clueGO gene ontology plugin for cytoscape: map clustered or essential genes to gene ontology, or KEGG pathway

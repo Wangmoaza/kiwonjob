@@ -262,11 +262,12 @@ def pairwise_distance(G, node_list, another_list=None):
 	if another_list is None:
 		ls = list(node_list)
 	else:
-		ls = list(set(node_list) & set(another_list))
+		ls = list(set(node_list) & set(another_list)) # intersection
 		node_list = list(node_list)
 		another_list = list(another_list)
 
 	# calculate within-list pairwise distance
+	# for two lists, calculate pairwise distance for intersection
 	list_len = len(ls)
 	path_len_list = []
 	for i in range(list_len):

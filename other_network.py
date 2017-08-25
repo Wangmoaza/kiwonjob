@@ -42,9 +42,10 @@ def do_centrality():
     central_df.to_csv('../HumanNet_centrality.tsv', sep='\t')
 ### END - do_centrality
 
-def main():
+
+def do_essentiality():
     df = pd.read_table('../PPI_vidal_all_uniq.tsv', 
-                sep='\t', header=None, names=['src', 'dest'], index_col=None)
+            sep='\t', header=None, names=['src', 'dest'], index_col=None)
     G = construct_graph(df, directed=False)
     all_nodes = nx.nodes(G)
 
@@ -85,7 +86,53 @@ def main():
                         
     node_df.apply(pd.to_numeric, errors='coerce', downcast='integer')
     node_df.to_csv('../ppi_essentiality.tsv', sep='\t')
+### END - do_essentiality
 
+
+def cal_distance(G, ess_df, title=""):
+    path_df = pd.DataFrame()
+    for col in ess_df.columns:
+        print "running for " + col
+        # make sets
+        ess_set = set(ess_df[ess_df[col] == 1].index)
+        non_set = set(ess_df[ess_df[col] == 0].index)
+        pred_set = set(ess_df[ess_df['tumor_pred_ess'] == 1].index)
+        
+        # get paths
+        ess_path = pairwise_distance(G, list(ess_set))
+        non_path = pairwise_distance(G, list(non_set))
+        ess_non_path = pairwise_distance(G, list(ess_set), another_list=list(non_set))
+        ess_pred_path = pairwise_distance(G, list(ess_set), another_list=list(pred_set))
+        
+        # print path ratio
+        print "{0}\tess\t{1}".format(col, path_exist_ratio(ess_path))
+        print "{0}\tnon\t{1}".format(col, path_exist_ratio(non_path))
+        print "{0}\tess_non\t{1}".format(col, path_exist_ratio(ess_non_path))
+        print "{0}\tess_pred\t{1}".format(col, path_exist_ratio(ess_pred_path))
+
+        # write path lengths to dataframe
+        #path_list = [ess_path, non_path, ess_non_path, ess_pred_path]
+        #name_list = ['ess', 'non', 'ess_non', 'ess_tumor_pred']
+        #for path, name in zip(path_list, name_list):
+        #    path = np.array(path)
+        #    path = path[path != np.inf] # exclude infinite values
+        #    path_df[col[:-3] + name] = pd.Series(path)
+        ### END - for path, name
+    ### END - for col
+
+    #path_df.to_csv("../{0}_path_length_essentiality.tsv".format(title), sep='\t')
+### END - cal_distance
+
+
+def main():
+    df = pd.read_table('../HumanNet_all_uniq.txt', 
+                sep='\t', header=None, names=['src', 'dest'], index_col=None)
+    G = construct_graph(df, directed=False)
+    all_nodes = nx.nodes(G)
+    ess_df = pd.read_table("../HumanNet_essentiality.tsv", sep='\t', header=0, index_col=0)
+
+    cal_distance(G, ess_df, title='HumanNet')
+### END - main
 
 if __name__ == "__main__":
     main()
