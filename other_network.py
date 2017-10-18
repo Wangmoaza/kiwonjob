@@ -31,7 +31,7 @@ def construct_graph(df, directed=True):
 ### END - construct_graph
 
 def do_centrality():
-    df = pd.read_table('../HumanNet_all_uniq.tsv', 
+    df = pd.read_table('../PPI_vidal_all_uniq.tsv', 
                     sep='\t', header=None, names=['src', 'dest'], index_col=None)
     G = construct_graph(df, directed=False)
     print "constructed graph..."
@@ -41,11 +41,11 @@ def do_centrality():
     #central_df['closeness'] = pd.Series(closeness)
     #central_df['between'] = pd.Series(between)
     # largest eigenvalue of the adjacency matrix
-    central_df = pd.read_table('../HumanNet_centrality.tsv', sep='\t', header=0, index_col=0)
+    central_df = pd.read_table('../PPI_centrality.tsv', sep='\t', header=0, index_col=0)
     max_eigenval = max(nx.adjacency_spectrum(G))
     print "max eigen value", max_eigenval
     central_df['katz'] = pd.Series(nx.katz_centrality(G, alpha=1/max_eigenval))
-    central_df.to_csv('../HumanNet_centrality_updated.tsv', sep='\t')
+    central_df.to_csv('../PPI_centrality_updated.tsv', sep='\t')
 ### END - do_centrality
 
 
