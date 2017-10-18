@@ -14,7 +14,7 @@ The source codes for the project can be cloned from GitHub repository [here](htt
 * *Gene_c3_top_case_3x_relu_1_T_0.5_3.tsv* : normal predicted essential genes
 * *Gene_c3_top_case_3x_relu_1_N_0.5_3.tsv* : tumor predicted essential genes
 * *PPI_vidal_all_uniq.tsv* : PPI network edge information
-* *HumanNet_all_uniq.txt* : HumanNet functional network edge information
+* *HumanNet_all_uniq.tsv* : HumanNet functional network edge information
 
 #### files made by me
 

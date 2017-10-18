@@ -31,15 +31,20 @@ def construct_graph(df, directed=True):
 ### END - construct_graph
 
 def do_centrality():
-    df = pd.read_table('../HumanNet_all_uniq.txt', 
+    df = pd.read_table('../HumanNet_all_uniq.tsv', 
                     sep='\t', header=None, names=['src', 'dest'], index_col=None)
     G = construct_graph(df, directed=False)
     all_nodes = nx.nodes(G)
-    in_degree, out_degree, closeness, between = centrality(G)
-    central_df = pd.DataFrame(index=all_nodes)
-    central_df['closeness'] = pd.Series(closeness)
-    central_df['between'] = pd.Series(between)
-    central_df.to_csv('../HumanNet_centrality.tsv', sep='\t')
+    #in_degree, out_degree, closeness, between = centrality(G)
+    #central_df = pd.DataFrame(index=all_nodes)
+    #central_df['closeness'] = pd.Series(closeness)
+    #central_df['between'] = pd.Series(between)
+    # largest eigenvalue of the adjacency matrix
+    central_df = pd.read_table('../HumanNet_centrality.tsv', sep='\t', header=0, index_col=0)
+    max_eigenval = max(nx.adjacency_spectrum(G))
+    print max_eigenval
+    central_df['katz'] = pd.Series(nx.katz_centrality(G))
+    central_df.to_csv('../HumanNet_centrality_updated.tsv', sep='\t')
 ### END - do_centrality
 
 
@@ -125,13 +130,13 @@ def cal_distance(G, ess_df, title=""):
 
 
 def main():
-    df = pd.read_table('../HumanNet_all_uniq.txt', 
-                sep='\t', header=None, names=['src', 'dest'], index_col=None)
-    G = construct_graph(df, directed=False)
-    all_nodes = nx.nodes(G)
-    ess_df = pd.read_table("../HumanNet_essentiality.tsv", sep='\t', header=0, index_col=0)
-
-    cal_distance(G, ess_df, title='HumanNet')
+    #df = pd.read_table('../HumanNet_all_uniq.txt', 
+    #            sep='\t', header=None, names=['src', 'dest'], index_col=None)
+    #G = construct_graph(df, directed=False)
+    #all_nodes = nx.nodes(G)
+    #ess_df = pd.read_table("../HumanNet_essentiality.tsv", sep='\t', header=0, index_col=0)
+    #cal_distance(G, ess_df, title='HumanNet')
+    do_centrality()
 ### END - main
 
 if __name__ == "__main__":
