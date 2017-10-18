@@ -44,7 +44,7 @@ def do_centrality():
     central_df = pd.read_table('../HumanNet_centrality.tsv', sep='\t', header=0, index_col=0)
     max_eigenval = max(nx.adjacency_spectrum(G))
     print "max eigen value", max_eigenval
-    central_df['katz'] = pd.Series(nx.katz_centrality(G))
+    central_df['katz'] = pd.Series(nx.katz_centrality(G, alpha=1/max_eigenval))
     central_df.to_csv('../HumanNet_centrality_updated.tsv', sep='\t')
 ### END - do_centrality
 

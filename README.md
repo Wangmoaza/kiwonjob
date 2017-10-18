@@ -113,6 +113,10 @@ Visualized cluster c2f4 with cytoscape
 
 * summarized results to presentation file
 
+#### 2017-10-19
+
+* Calculated Katz centrality for PPI, HumanNet, and bayesian network. Added the results to centrality file.
+
 #### TODO
 
 * clueGO gene ontology plugin for cytoscape: map clustered or essential genes to gene ontology, or KEGG pathway
