@@ -34,7 +34,8 @@ def do_centrality():
     df = pd.read_table('../HumanNet_all_uniq.tsv', 
                     sep='\t', header=None, names=['src', 'dest'], index_col=None)
     G = construct_graph(df, directed=False)
-    all_nodes = nx.nodes(G)
+    print "constructed graph..."
+    #all_nodes = nx.nodes(G)
     #in_degree, out_degree, closeness, between = centrality(G)
     #central_df = pd.DataFrame(index=all_nodes)
     #central_df['closeness'] = pd.Series(closeness)
@@ -42,7 +43,7 @@ def do_centrality():
     # largest eigenvalue of the adjacency matrix
     central_df = pd.read_table('../HumanNet_centrality.tsv', sep='\t', header=0, index_col=0)
     max_eigenval = max(nx.adjacency_spectrum(G))
-    print max_eigenval
+    print "max eigen value", max_eigenval
     central_df['katz'] = pd.Series(nx.katz_centrality(G))
     central_df.to_csv('../HumanNet_centrality_updated.tsv', sep='\t')
 ### END - do_centrality
